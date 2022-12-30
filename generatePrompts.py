@@ -8,7 +8,7 @@ if len(sys.argv) < 3:
     print("generatePrompts.py - Use openAI GPT3 to generate stable diffusion prompts. Runs recursively in specified folder.\n\n Usage: python generaptePrompts.py [folder/containing/text] [textfilename] [textName]\n\nExample python generatePrompts.py . section.txt 'Pride and Prejudice'")
     sys.exit()
 # Load your API key from an environment variable or secret management service
-openai.api_key = "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"
+openai.api_key = ""
 chapterCount = 0
 for path in Path(sys.argv[1]).rglob(sys.argv[2]):
     chapterCount += 1
