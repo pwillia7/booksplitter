@@ -8,45 +8,50 @@ if len(sys.argv) < 3:
     print("generatePrompts.py - Use openAI GPT3 to generate stable diffusion prompts. Runs recursively in specified folder.\n\n Usage: python generaptePrompts.py [folder/containing/text] [textfilename] [textName]\n\nExample python generatePrompts.py . section.txt 'Pride and Prejudice'")
     sys.exit()
 # Load your API key from an environment variable or secret management service
-openai.api_key = ""
+openai.api_key = "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"
+chapterCount = 0
 for path in Path(sys.argv[1]).rglob(sys.argv[2]):
+    chapterCount += 1
+    print("Prompt file found...")
     promptFile = path.open()
-    count = 0
     prompts = []
+    print("Generating prompts via GPT-3...")
     while True:
-        time.sleep(.25)
-        count += 1
         # Get next line from file
         line = promptFile.readline()
         for i in range(5):
             try:
-                response = openai.Completion.create(model="text-davinci-003", prompt="Distill and summarize the following passage of " + sys.argv[3] + " and return a csv of key words for the passage: " + line, frequency_penalty=0,
+                response = openai.Completion.create(model="text-davinci-003", prompt="Create a summary of each scene from the following passage of " + sys.argv[3] + ":\n" + line + ".", frequency_penalty=0,
     presence_penalty=0, top_p=1, temperature=0.75, max_tokens=256)
             except:
+                print("API Response failed. Retrying...")
                 time.sleep(1)
                 continue
             else:
+                for j in range(5):
+                    print("2nd API call in progress...")
+                    try:
+                        response2 = openai.Completion.create(model="text-davinci-003", prompt="Return a single csv list of keywords for the following scene summaries from " + sys.argv[3] + ":\n" + response.choices[0].text, frequency_penalty=0,
+    presence_penalty=0, top_p=1, temperature=0.75, max_tokens=256)
+                    except:
+                        print("API Response 2 failed. Retrying...")
+                        time.sleep(1)
+                        continue
+                    else:
+                        print("Prompt successfully generated.")
+                        break
                 break
-        prompts.append(response.choices[0].text)
+        prompts.append(response2.choices[0].text)
+        print("Prompt Generation Completed. Generated " + str(len(prompts)) + " prompts.")
         # if line is empty
         # end of file is reached
         if not line:
+            chapterCount +=1
+            mainPromptFile = open(str(path.parents[1]) + "/allPrompts.txt","a+")
+            mainPromptFile.write("Chapter: " + str(chapterCount))
             finPromptFile = open(str(path.parents[0]) + "/finishedPrompts.txt","a+")
-            finLogFile = open(str(path.parents[0]) + "/finishedPrompts.log","x")
-            promptCount = 1
-            keywSwitch = 0
             for prompt in prompts:
-                finLogFile.write(prompt)
-                promptLines = prompt.split("\n")
-                for pline in promptLines:
-                    if keywSwitch == 1:
-                        finPromptFile.write(pline)
-                        keywSwitch = 0
-                        continue
-                    if "Key words:" in pline or "key words:" in pline or "keywords:" in pline or "Key Words:" in pline or "Keywords:" in pline:
-                        finPromptFile.write(pline + "\n")
-                        promptCount += 1
-                        if pline == "Key words:" or pline == "key words:" or pline == "keywords:" or pline == "Key Words:" or pline == "Keywords:":
-                            keywSwitch = 1
-            break
+                finPromptFile.write(prompt)
+                mainPromptFile.write(prompt)
+            break                    
     promptFile.close()

@@ -13,6 +13,9 @@ curWordCount = 0
 # cut up on delimiter
 chapters = []
 chapterCount = -1
+# Create edit book file
+editedBookFileName = bookFile + "-edited"
+editedBookFile = open(editedBookFileName, "a+")
 with open(bookFile, "r") as book:
     for line in book:
         words = line.lower()
@@ -30,11 +33,12 @@ with open(bookFile, "r") as book:
         if delimiterText in line:
             chapterCount += 1
             chapters.append("\n")
-        chapters[chapterCount] += "\n" + line
+        chapters[chapterCount] += line
 # make folders and files for chapters. Write the chapter files out.
 chapterCount = 1
 for chapter in chapters:
-    sections = chapter.split(sectionDelim)
+    editedBookFile.write(chapter)
+    sections = chapter.replace("\n","",1).split(sectionDelim)
     folderPath = bookName + "-Chapter" + str(chapterCount)
     chapterFolder = folderPath + "/Chapter" + str(chapterCount) + ".txt"
     os.mkdir(folderPath)
@@ -43,8 +47,9 @@ for chapter in chapters:
     sectionCount = 1
     sectionFile = open(folderPath + "/sections" + ".txt", "w")
     for section in sections:
-        sectionFile.write(section.replace("\n",""))
+        sectionFile.write(section.replace("\n"," "))
         sectionFile.write("\n")
         sectionCount += 1
+        # Find section in editedbook and insert image insert callout
     chapterCount += 1
 # cut into smaller pieces
