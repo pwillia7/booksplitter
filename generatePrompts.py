@@ -21,8 +21,7 @@ for path in Path(sys.argv[1]).rglob(sys.argv[2]):
         line = promptFile.readline()
         for i in range(5):
             try:
-                response = openai.Completion.create(model="text-davinci-003", prompt="Create a summary of each scene from the following passage of " + sys.argv[3] + ":\n" + line + ".", frequency_penalty=0,
-    presence_penalty=0, top_p=1, temperature=0.75, max_tokens=256)
+                response = openai.Completion.create(model="text-davinci-003", prompt="Create a summary of each scene from the following passage of " + sys.argv[3] + ":\n" + line + ".", frequency_penalty=0, presence_penalty=0, top_p=1, temperature=0.75, max_tokens=256)
             except:
                 print("API Response failed. Retrying...")
                 time.sleep(1)
@@ -31,8 +30,7 @@ for path in Path(sys.argv[1]).rglob(sys.argv[2]):
                 for j in range(5):
                     print("2nd API call in progress...")
                     try:
-                        response2 = openai.Completion.create(model="text-davinci-003", prompt="Return a single csv list of keywords for the following scene summaries from " + sys.argv[3] + ":\n" + response.choices[0].text, frequency_penalty=0,
-    presence_penalty=0, top_p=1, temperature=0.75, max_tokens=256)
+                        response2 = openai.Completion.create(model="text-davinci-003", prompt="Return a single csv list of keywords for the following scene summaries from " + sys.argv[3] + ":\n" + response.choices[0].text, frequency_penalty=0, presence_penalty=0, top_p=1, temperature=0.75, max_tokens=256)
                     except:
                         print("API Response 2 failed. Retrying...")
                         time.sleep(1)
